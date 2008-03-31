@@ -29,10 +29,12 @@ module Seed
         options = {
           :limit => 25
         }.merge(options)
-      
+        
         model = get_model_class
         puts "* Seeding #{model}"
       
+        model.delete_all
+        
         get_special_types
       
         @@attributes ||= {}
@@ -42,6 +44,7 @@ module Seed
           instance = model.new
         
           @@attributes.each do |name, type|
+            next if name == 'id'
             puts "  setting `#{name}` to `#{Plant.produce(type)}`"
             instance.send("#{name}=", Plant.produce(type))
           end
@@ -53,6 +56,8 @@ module Seed
 
     protected
       def self.load_from_file
+        raise "Seed file [#{@@loads_from}] not found!" unless File.exists?(File.join(RAILS_ROOT, 'db', 'seeds', @@loads_from))
+        
         if @@loads_from =~ /(.*).csv$/
           load_from_csv(@@loads_from)
         elsif @@loads_from =~ /(.*).xml$/
@@ -113,7 +118,7 @@ module Seed
       def self.load_fixture_file(dir, filename)
         Dir.glob(File.join(RAILS_ROOT, dir, filename)).each do |fixture_file|
           puts fixture_file
-          Fixtures.create_fixtures(dir, File.basename(fixture_file, ".#{extension}"))
+          Fixtures.create_fixtures(dir, File.basename(fixture_file, ".*"))
         end
       end
   end
