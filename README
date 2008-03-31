@@ -1,13 +1,49 @@
 Seed
 ====
 
-Introduction goes here.
+A plugin to help with generating and/or inserting seed data into your database.  Seed will
+generate data for you or load it from fixtures or arbitrary Yaml, CSV, or (eventually) XML
+files.  The basic workflow goes like this:
 
+1. Create seed files.  These live in db/seeds/ and are named for the tables of your models, 
+like Person (model), people (table) would yield people_seed.rb.
 
-Example
-=======
+2. Create a class named for the file (people_seed.rb would have PeopleSeed) that inherits from
++Seed::Planter+.
 
-Example goes here.
+3. Fill in your directives for attributes or file loads, or you can leave it empty and Seed will
+enumerate your columns and generate data for you.
 
+You can also generate static versions of the seeds for your current models using the db:seeds:generate
+Rake task.
 
-Copyright (c) 2008 [name of plugin creator], released under the MIT license
+Examples
+========
+
+    # db/seeds/products_seed.rb
+    class ProductsSeed < Seed::Planter
+      attribute :name, :string
+      
+      # Address attribute types are special and generate
+      # proper data.
+      attribute :address, :address
+      
+      # An email attribute will generate an e-mail address.
+      attribute :email, :email      
+    end
+
+    # db/seeds/people_seed.rb
+    class PeopleSeed < Seed::Planter
+      # Tells Seed that you want to load seed data from
+      # the file db/seeds/people.yml
+      loads_from "people.yml"
+    end
+    
+    # db/seeds/things_seed.rb
+    class ThingsSeed < Seed::Planter
+      # Tells Seed that you want to load seed data from
+      # the fixtures file (test/fixtures/things.yml)
+      loads_from :fixtures
+    end
+
+Copyright (c) 2008 Jeremy McAnally, released under the MIT license

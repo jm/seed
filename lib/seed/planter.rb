@@ -5,17 +5,19 @@ module Seed
     # Seeds data from a file (given as a string filename) or
     # +:fixtures+.
     def self.loads_from(filename)
+      @@attributes = nil
       @@loads_from = filename
     end
     
     # Adds a special attribute to the list
     def self.attribute(name, type)
+      @@loads_from = nil
       @@attributes ||= {}
       @@attributes[name.to_s] = type.to_s
     end
 
     def self.plant!(options = {})
-      if defined?(@@loads_from)
+      if @@loads_from
         if @@loads_from.is_a?(String)
           # If we're given a string, use it as a filename...
           load_from_file
@@ -116,14 +118,3 @@ module Seed
       end
   end
 end
-
-# class ProductsSeed < Seed::Planter
-#   attribute :name, :string
-#   attribute :address, :address
-#   attribute :email, :email
-#   attribute :location, :string
-# end
-# 
-# class PeopleSeed < Seed::Planter
-#   loads_from "people.yml"
-# end
