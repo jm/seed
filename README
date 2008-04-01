@@ -6,9 +6,9 @@ generate data for you or load it from fixtures or arbitrary Yaml, CSV, or (event
 files.  The basic workflow goes like this:
 
 1. Create seed files.  These live in db/seeds/ and are named for the tables of your models, 
-like Person (model), people (table) would yield people_seed.rb.
+like +Person+ (model), +people+ (table) would yield +people_seed.rb+.
 
-2. Create a class named for the file (people_seed.rb would have PeopleSeed) that inherits from
+2. Create a class named for the file (+people_seed.rb+ would have +PeopleSeed+) that inherits from
 +Seed::Planter+.
 
 3. Fill in your directives for attributes or file loads, or you can leave it empty and Seed will
@@ -16,6 +16,41 @@ enumerate your columns and generate data for you.
 
 You can also generate static versions of the seeds for your current models using the db:seeds:generate
 Rake task.
+
+So, let's say you have a model +User+, with attributes +username+ (string), +password+ (string), 
++email_address+ (string), favorite_quote (string), and administrator (boolean).  To get a basic seed 
+file, you need to execute <tt>rake db:seeds:generate</tt>.  This task will yield a file like this:
+
+    class UsersSeed < Seed::Planter
+      attribute :username, :string
+      attribute :password, :string
+      attribute :email_address, :string
+      attribute :favorite_quote, :string
+      attribute :adminstrator, :boolean
+    end
+
+Now, since we have a few special fields, we can use Seed's special types for +username+, +password+, and +email_address+.
+
+    class UsersSeed < Seed::Planter
+      attribute :username, :username
+      attribute :password, :password
+      attribute :email_address, :email
+      attribute :favorite_quote, :string
+      attribute :adminstrator, :boolean
+    end
+
+This will generate proper data (for example, "jmcanally" rather than "Lorem ispum dolormet" for username).
+
+You can also skip specifying a type and provide the data for the field in a +Proc+.  For example, if you wanted to 
+have some specialized logic for setting the value of a field:
+
+    class JobsSeed < Seed::Planter
+      attribute :description, :string
+      attribute :script, Proc { ['upload', 'update', 'find_files'].sort { rand(3) - 1 }[0] }
+    end
+
+You can also call methods from the seed class in the +Proc+ if you'd like (direct support for method class on the 
+seed class will be added soon).
 
 Examples
 ========
@@ -28,8 +63,7 @@ Examples
       # proper data.
       attribute :address, :address
       
-      # An email attribute will generate an e-mail address.
-      attribute :email, :email      
+      attribute :email, proc { "test@example.com" }      
     end
 
     # db/seeds/people_seed.rb

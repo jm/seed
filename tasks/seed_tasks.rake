@@ -4,8 +4,17 @@ namespace :db do
     Dir.glob("#{RAILS_ROOT}/db/seeds/*.rb").each do |file|
       require file
       
+      options = {}
+      
+      # Command line options
+      [:limit].each do |opt|
+        if ENV[opt.to_s.upcase]
+          options[opt] = ENV[opt.to_s.upcase]
+        end
+      end
+      
       seed_class = (file.gsub(/^#{RAILS_ROOT}\/db\/seeds\/(.*).rb/, '\1')).classify.constantize
-      seed_class.plant!
+      seed_class.plant!(options)
     end
   end
   
@@ -25,10 +34,6 @@ namespace :db do
           f.write "end"
         end
       end
-    end
-    
-    desc "Clobber all your seed files"
-    task :clobber => :environment do
     end
   end
 end

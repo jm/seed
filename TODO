@@ -1,0 +1,4 @@
+* Move from rake db:seeds:generate to script/generate seed X
+* Implement XML import
+* Allow partial file import with attribute overrides (rather than the current either/or approach)
+* DRY up the code a little bit, especially in file/fixture loading
